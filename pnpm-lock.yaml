@@ -743,9 +743,6 @@ importers:
       aws-sdk-client-mock:
         specifier: ^4.1.0
         version: 4.1.0
-      aws-sdk-client-mock-vitest:
-        specifier: ^7.1.0
-        version: 7.1.0(@smithy/types@4.17.2)(aws-sdk-client-mock@4.1.0)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(happy-dom@20.11.2)(jiti@1.21.7)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(lightningcss@1.33.0)(sass@1.102.0)(supports-color@8.1.1)(terser@5.49.0)(tsx@4.23.12)(yaml@2.9.0))
       eslint:
         specifier: ^10.0.0
         version: 10.8.1(jiti@1.21.7)(supports-color@8.1.1)
@@ -6197,14 +6194,6 @@ packages:
     hasBin: true
     peerDependencies:
       postcss: ^8.1.0
-
-  aws-sdk-client-mock-vitest@7.1.0:
-    resolution: {integrity: sha512-Qjl5cHdTysOfsq7ac0UFchQKW/A4NbVL4uhU1FcPmawAQQ8Bt6xsTJA//gWCkZO9+hHQxcCJfpmWbSYm02po1A==}
-    engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
-    peerDependencies:
-      '@smithy/types': '>=3.5.0'
-      aws-sdk-client-mock: '>=2.2.0'
-      vitest: '>=3.2.0'
 
   aws-sdk-client-mock@4.1.0:
     resolution: {integrity: sha512-h/tOYTkXEsAcV3//6C1/7U4ifSpKyJvb6auveAepqqNJl6TdZaPFEtKjBQNf8UxQdDP850knB2i/whq4zlsxJw==}
@@ -19447,13 +19436,6 @@ snapshots:
       picocolors: 1.1.1
       postcss: 8.5.26
       postcss-value-parser: 4.2.0
-
-  aws-sdk-client-mock-vitest@7.1.0(@smithy/types@4.17.2)(aws-sdk-client-mock@4.1.0)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(happy-dom@20.11.2)(jiti@1.21.7)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(lightningcss@1.33.0)(sass@1.102.0)(supports-color@8.1.1)(terser@5.49.0)(tsx@4.23.12)(yaml@2.9.0)):
-    dependencies:
-      '@smithy/types': 4.17.2
-      '@vitest/expect': 4.1.10
-      aws-sdk-client-mock: 4.1.0
-      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(happy-dom@20.11.2)(jiti@1.21.7)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(lightningcss@1.33.0)(sass@1.102.0)(supports-color@8.1.1)(terser@5.49.0)(tsx@4.23.12)(yaml@2.9.0)
 
   aws-sdk-client-mock@4.1.0:
     dependencies:
