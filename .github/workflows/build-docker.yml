@@ -4,11 +4,16 @@ name: Build and Publish Docker Image
 # depends on immich-app org secrets and reusable workflows this fork doesn't have.
 # Builds server/Dockerfile only (this fork doesn't modify machine-learning) and
 # pushes to this repo's own GHCR namespace.
+#
+# Deliberately does NOT run on every push to `production` - only on publishing a
+# GitHub Release (tags the image `latest` + the release's semver) or a manual
+# workflow_dispatch (tags only `sha-<short-sha>`, no `latest`, so ad-hoc runs
+# can't silently move what `latest` points to). On a release, docker-compose.prod.yml
+# and example.env are also attached to the release as downloadable assets.
 
 on:
-  push:
-    branches: [production]
-    tags: ['v*.*.*']
+  release:
+    types: [published]
   workflow_dispatch:
 
 concurrency:
@@ -25,7 +30,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - name: Checkout
@@ -49,11 +54,10 @@ jobs:
           flavor: |
             latest=false
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'production') }}
-            type=raw,value=production,enable=${{ github.ref == format('refs/heads/{0}', 'production') }}
-            type=sha,format=short,prefix=sha-
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short,prefix=sha-
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -71,3 +75,11 @@ jobs:
             BUILD_SOURCE_COMMIT=${{ github.sha }}
             BUILD_IMAGE=${{ github.repository }}
             BUILD_ID=${{ github.run_id }}
+
+      - name: Attach install files to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            docker/docker-compose.prod.yml
+            docker/example.env
