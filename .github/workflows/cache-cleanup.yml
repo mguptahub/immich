@@ -1,9 +1,11 @@
+# NOTE: automatic triggers disabled for this fork - this workflow mirrors
+# immich-app/immich upstream CI/community-management and doesn't apply here
+# (missing org secrets/reusable workflows it depends on). Kept as reference
+# and still runnable manually via workflow_dispatch. See build-docker.yml for
+# this fork's own image build/publish workflow.
 name: Cache Cleanup
 on:
-  pull_request:
-    types:
-      - closed
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
