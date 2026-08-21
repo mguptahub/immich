@@ -58,6 +58,24 @@ For local testing, [`docker/docker-compose.dev.yml`](docker/docker-compose.dev.y
 
 Custom development happens on the [`production`](https://github.com/mguptahub/immich/tree/production) branch; `main` stays a clean mirror of upstream. Published Docker images are built from `production` and tagged releases — see [Releases](https://github.com/mguptahub/immich/releases).
 
+### Quick start (production, no clone required)
+
+Every release attaches a ready-to-use `docker-compose.prod.yml` and `example.env`. Download the latest release's copies and bring the stack up directly — no need to clone this repo:
+
+```bash
+mkdir immich-app && cd immich-app
+
+curl -fsSL -O https://github.com/mguptahub/immich/releases/latest/download/docker-compose.prod.yml
+curl -fsSL -o .env https://github.com/mguptahub/immich/releases/latest/download/example.env
+
+# Edit .env: set DB_PASSWORD and UPLOAD_LOCATION, and uncomment the
+# STORAGE_PROVIDER/S3_* lines if you want S3-compatible storage instead of local disk.
+
+docker compose -f docker-compose.prod.yml up -d
+```
+
+To pin a specific release instead of always tracking `latest`, swap `releases/latest/download` for `releases/download/<tag>` (e.g. `releases/download/v3.1.0-mgh-1/docker-compose.prod.yml`) and set `IMMICH_SERVER_IMAGE_TAG` in `.env` to match.
+
 ## Links
 
 - [Documentation](https://docs.immich.app/)
