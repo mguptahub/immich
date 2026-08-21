@@ -1,4 +1,4 @@
-import { SystemMetadataKey } from 'src/enum';
+import { StorageProvider, SystemMetadataKey } from 'src/enum';
 import { StorageService } from 'src/services/storage.service';
 import { ImmichStartupError } from 'src/utils/misc';
 import { mockEnvData } from 'test/repositories/config.repository.mock';
@@ -25,6 +25,7 @@ describe(StorageService.name, () => {
           storage: {
             ignoreMountCheckErrors: false,
             mediaLocation: '/data',
+            provider: StorageProvider.Local,
           },
         }),
       );
@@ -90,6 +91,7 @@ describe(StorageService.name, () => {
           storage: {
             ignoreMountCheckErrors: false,
             mediaLocation: '/data',
+            provider: StorageProvider.Local,
           },
         }),
       );
@@ -165,7 +167,7 @@ describe(StorageService.name, () => {
       mocks.systemMetadata.get.mockResolvedValue({ mountChecks: { upload: true } });
       mocks.config.getEnv.mockReturnValue(
         mockEnvData({
-          storage: { ignoreMountCheckErrors: true },
+          storage: { ignoreMountCheckErrors: true, provider: StorageProvider.Local },
         }),
       );
       mocks.asset.getFileSamples.mockResolvedValue([]);

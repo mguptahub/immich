@@ -493,9 +493,18 @@ const newRealRepository = <T extends BaseServiceDeps[number]>(key: T, db: Kysely
       return new key(LoggingRepository.create()) as InstanceType<T>;
     }
 
-    case MediaRepository:
+    case MediaRepository: {
+      return new key(
+        new StorageRepository(new ConfigRepository(), LoggingRepository.create()),
+        LoggingRepository.create(),
+      ) as InstanceType<T>;
+    }
+
     case MetadataRepository: {
-      return new key(LoggingRepository.create()) as InstanceType<T>;
+      return new key(
+        new StorageRepository(new ConfigRepository(), LoggingRepository.create()),
+        LoggingRepository.create(),
+      ) as InstanceType<T>;
     }
 
     case PluginRepository: {
@@ -503,7 +512,7 @@ const newRealRepository = <T extends BaseServiceDeps[number]>(key: T, db: Kysely
     }
 
     case StorageRepository: {
-      return new key(LoggingRepository.create()) as InstanceType<T>;
+      return new key(new ConfigRepository(), LoggingRepository.create()) as InstanceType<T>;
     }
 
     case TagRepository: {

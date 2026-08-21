@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Next, Param, Query, Res } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Next, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Endpoint, HistoryBuilder } from 'src/decorators';
 import { AuthDto } from 'src/dtos/auth.dto';
 import {
@@ -12,6 +12,7 @@ import {
 import { ApiTag, Permission } from 'src/enum';
 import { Auth, Authenticated, FileResponse } from 'src/middleware/auth.guard';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { StorageRepository } from 'src/repositories/storage.repository';
 import { IntegrityService } from 'src/services/integrity.service';
 import { sendFile } from 'src/utils/file';
 import { UUIDv7ParamDto } from 'src/validation';
@@ -22,6 +23,7 @@ export class IntegrityAdminController {
   constructor(
     private logger: LoggingRepository,
     private service: IntegrityService,
+    private storageRepository: StorageRepository,
   ) {}
 
   @Get('summary')
@@ -57,10 +59,11 @@ export class IntegrityAdminController {
   @Authenticated({ permission: Permission.Maintenance, admin: true })
   async getIntegrityReportFile(
     @Param() { id }: UUIDv7ParamDto,
+    @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
   ): Promise<void> {
-    await sendFile(res, next, () => this.service.getIntegrityReportFile(id), this.logger);
+    await sendFile(res, req, next, () => this.service.getIntegrityReportFile(id), this.storageRepository, this.logger);
   }
 
   @Delete('report/:id')

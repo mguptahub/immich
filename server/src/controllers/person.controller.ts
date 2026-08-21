@@ -11,10 +11,11 @@ import {
   Post,
   Put,
   Query,
+  Req,
   Res,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Endpoint, HistoryBuilder } from 'src/decorators';
 import { BulkIdResponseDto, BulkIdsDto } from 'src/dtos/asset-ids.response.dto';
 import { AuthDto } from 'src/dtos/auth.dto';
@@ -32,6 +33,7 @@ import {
 import { ApiTag, Permission } from 'src/enum';
 import { Auth, Authenticated, FileResponse } from 'src/middleware/auth.guard';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { StorageRepository } from 'src/repositories/storage.repository';
 import { PersonService } from 'src/services/person.service';
 import { sendFile } from 'src/utils/file';
 import { UUIDParamDto } from 'src/validation';
@@ -42,6 +44,7 @@ export class PersonController {
   constructor(
     private service: PersonService,
     private logger: LoggingRepository,
+    private storageRepository: StorageRepository,
   ) {
     this.logger.setContext(PersonController.name);
   }
@@ -164,12 +167,13 @@ export class PersonController {
     history: new HistoryBuilder().added('v1').beta('v1').stable('v2'),
   })
   async getPersonThumbnail(
+    @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
     @Auth() auth: AuthDto,
     @Param() { id }: UUIDParamDto,
   ) {
-    await sendFile(res, next, () => this.service.getThumbnail(auth, id), this.logger);
+    await sendFile(res, req, next, () => this.service.getThumbnail(auth, id), this.storageRepository, this.logger);
   }
 
   @Put(':id/reassign')

@@ -1,5 +1,6 @@
 import mockfs from 'mock-fs';
 import { CrawlOptionsDto } from 'src/dtos/library.dto';
+import { ConfigRepository } from 'src/repositories/config.repository';
 import { LoggingRepository } from 'src/repositories/logging.repository';
 import { StorageRepository } from 'src/repositories/storage.repository';
 import { automock } from 'test/utils';
@@ -183,8 +184,14 @@ describe(StorageRepository.name, () => {
   let sut: StorageRepository;
 
   beforeEach(() => {
-    // eslint-disable-next-line no-sparse-arrays
-    sut = new StorageRepository(automock(LoggingRepository, { args: [, { getEnv: () => ({}) }], strict: false }));
+    const configMock = automock(ConfigRepository, { strict: false });
+    configMock.getEnv.mockReturnValue({ storage: {} } as ReturnType<ConfigRepository['getEnv']>);
+
+    sut = new StorageRepository(
+      configMock,
+      // eslint-disable-next-line no-sparse-arrays
+      automock(LoggingRepository, { args: [, { getEnv: () => ({}) }], strict: false }),
+    );
   });
 
   afterEach(() => {

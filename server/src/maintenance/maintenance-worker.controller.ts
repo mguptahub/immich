@@ -26,6 +26,7 @@ import { MaintenanceRoute } from 'src/maintenance/maintenance-auth.guard';
 import { MaintenanceWorkerService } from 'src/maintenance/maintenance-worker.service';
 import { GetLoginDetails } from 'src/middleware/auth.guard';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { StorageRepository } from 'src/repositories/storage.repository';
 import { LoginDetails } from 'src/services/auth.service';
 import { sendFile } from 'src/utils/file';
 import { respondWithCookie } from 'src/utils/response';
@@ -42,6 +43,7 @@ export class MaintenanceWorkerController {
     private logger: LoggingRepository,
     private service: MaintenanceWorkerService,
     private databaseBackupService: DatabaseBackupService,
+    private storageRepository: StorageRepository,
   ) {}
 
   /**
@@ -78,10 +80,18 @@ export class MaintenanceWorkerController {
   @MaintenanceRoute()
   async downloadDatabaseBackup(
     @Param() { filename }: FilenameParamDto,
+    @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
   ) {
-    await sendFile(res, next, () => this.databaseBackupService.downloadBackup(filename), this.logger);
+    await sendFile(
+      res,
+      req,
+      next,
+      () => this.databaseBackupService.downloadBackup(filename),
+      this.storageRepository,
+      this.logger,
+    );
   }
 
   /**

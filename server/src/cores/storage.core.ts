@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { StorageAsset } from 'src/database';
 import {
@@ -133,8 +134,18 @@ export class StorageCore {
     return StorageCore.getNestedPath(StorageFolder.EncodedVideo, asset.ownerId, `${asset.id}.mp4`);
   }
 
+  /**
+   * HLS sessions are a transient transcoding cache written directly by ffmpeg (bypassing
+   * StorageRepository) and read back in near-real-time during playback, so they always live
+   * on local disk - deliberately outside the managed media root - regardless of storage
+   * provider. There is nothing to route to S3 here even when S3 storage is configured.
+   */
+  static getHlsCacheRoot(): string {
+    return join(tmpdir(), 'immich-hls');
+  }
+
   static getHlsSessionFolder({ ownerId, sessionId }: HlsSessionFolder) {
-    return StorageCore.getNestedPath(StorageFolder.EncodedVideo, ownerId, sessionId);
+    return join(StorageCore.getHlsCacheRoot(), ownerId, sessionId);
   }
 
   static getHlsVariantFolder({ ownerId, sessionId, variantIndex }: HlsVariantFolder) {

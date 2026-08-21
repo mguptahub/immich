@@ -1,4 +1,4 @@
-import { DatabaseExtension, ImmichEnvironment, ImmichWorker, LogFormat } from 'src/enum';
+import { DatabaseExtension, ImmichEnvironment, ImmichWorker, LogFormat, StorageProvider } from 'src/enum';
 import { ConfigRepository, EnvData } from 'src/repositories/config.repository';
 import { RepositoryInterface } from 'src/types';
 import { Mocked, vitest } from 'vitest';
@@ -85,6 +85,7 @@ export const envData: EnvData = {
 
   storage: {
     ignoreMountCheckErrors: false,
+    provider: StorageProvider.Local,
   },
 
   telemetry: {

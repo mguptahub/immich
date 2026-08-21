@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, Header, Headers, HttpCode, HttpStatus, Next, Param, Res } from '@nestjs/common';
+import { Controller, Delete, Get, Header, Headers, HttpCode, HttpStatus, Next, Param, Req, Res } from '@nestjs/common';
 import { ApiProduces, ApiTags } from '@nestjs/swagger';
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
 import { HLS_PLAYLIST_CONTENT_TYPE } from 'src/constants';
 import { Endpoint, HistoryBuilder } from 'src/decorators';
@@ -15,6 +15,7 @@ import {
 import { ApiTag, ImmichHeader, Permission, RouteKey } from 'src/enum';
 import { Auth, Authenticated, FileResponse } from 'src/middleware/auth.guard';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { StorageRepository } from 'src/repositories/storage.repository';
 import { HlsService } from 'src/services/hls.service';
 import { sendFile } from 'src/utils/file';
 import { UUIDParamDto } from 'src/validation';
@@ -25,6 +26,7 @@ export class VideoStreamController {
   constructor(
     private logger: LoggingRepository,
     private service: HlsService,
+    private storageRepository: StorageRepository,
   ) {}
 
   @Get(':id/video/stream/main.m3u8')
@@ -76,6 +78,7 @@ export class VideoStreamController {
     @Auth() auth: AuthDto,
     @Param() { id, sessionId, variantIndex, filename }: HlsSegmentParamDto,
     @Headers() headers: HlsSegmentHeaderDto,
+    @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
   ) {
@@ -86,8 +89,10 @@ export class VideoStreamController {
     }
     await sendFile(
       res,
+      req,
       next,
       () => this.service.getSegment(auth, id, sessionId, variantIndex, filename, headers[ImmichHeader.HlsInitSegment]),
+      this.storageRepository,
       this.logger,
     );
   }

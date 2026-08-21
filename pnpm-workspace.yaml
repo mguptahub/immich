@@ -67,3 +67,5 @@ shamefullyHoist: false
 verifyDepsBeforeRun: install
 minimumReleaseAgeExclude:
   - '@immich/ui@0.83.0'
+  - '@aws-sdk/client-s3@3.1115.0'
+  - '@aws-sdk/lib-storage@3.1115.0'

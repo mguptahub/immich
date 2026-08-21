@@ -14,38 +14,18 @@ import {
 } from 'src/enum';
 import { BaseService } from 'src/services/base.service';
 import { JobOf, SystemFlags } from 'src/types';
+import { detectMediaLocation } from 'src/utils/media-location';
 import { ImmichStartupError } from 'src/utils/misc';
 
 const docsMessage = `Please see https://docs.immich.app/administration/system-integrity#folder-checks for more information.`;
 
 @Injectable()
 export class StorageService extends BaseService {
-  private detectMediaLocation(): string {
-    const envData = this.configRepository.getEnv();
-    if (envData.storage.mediaLocation) {
-      return envData.storage.mediaLocation;
-    }
-
-    const targets: string[] = [];
-    const candidates = ['/data', '/usr/src/app/upload'];
-
-    for (const candidate of candidates) {
-      const isExists = this.storageRepository.existsSync(candidate);
-      if (isExists) {
-        targets.push(candidate);
-      }
-    }
-
-    if (targets.length === 1) {
-      return targets[0];
-    }
-
-    return '/usr/src/app/upload';
-  }
-
   @OnEvent({ name: 'AppBootstrap', priority: BootstrapEventPriority.StorageService })
   async onBootstrap() {
-    StorageCore.setMediaLocation(this.detectMediaLocation());
+    StorageCore.setMediaLocation(
+      detectMediaLocation(this.configRepository.getEnv(), (path) => this.storageRepository.existsSync(path)),
+    );
 
     await this.databaseRepository.withLock(DatabaseLock.SystemFileMounts, async () => {
       const flags =

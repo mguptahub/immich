@@ -3,7 +3,6 @@ import { ContainerDirectoryItem, ExifDateTime, Tags } from 'exiftool-vendored';
 import { Insertable } from 'kysely';
 import _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
-import { Stats } from 'node:fs';
 import { constants } from 'node:fs/promises';
 import { join, parse } from 'node:path';
 
@@ -26,6 +25,7 @@ import {
 import { ArgOf } from 'src/repositories/event.repository';
 import { ReverseGeocodeResult } from 'src/repositories/map.repository';
 import { ImmichTags } from 'src/repositories/metadata.repository';
+import { StorageStat } from 'src/repositories/storage.repository';
 import { AssetExifTable } from 'src/schema/tables/asset-exif.table';
 import { AssetFaceTable } from 'src/schema/tables/asset-face.table';
 import { PersonTable } from 'src/schema/tables/person.table';
@@ -663,7 +663,7 @@ export class MetadataService extends BaseService {
     return asset.type === AssetType.Image && !!(tags.MotionPhoto || tags.MicroVideo);
   }
 
-  private async applyMotionPhotos(asset: Asset, tags: ImmichTags, dates: Dates, stats: Stats) {
+  private async applyMotionPhotos(asset: Asset, tags: ImmichTags, dates: Dates, stats: StorageStat) {
     const isMotionPhoto = tags.MotionPhoto;
     const isMicroVideo = tags.MicroVideo;
     const videoOffset = tags.MicroVideoOffset;
@@ -993,7 +993,7 @@ export class MetadataService extends BaseService {
   private getDates(
     asset: { id: string; originalPath: string; fileCreatedAt: Date },
     exifTags: ImmichTags,
-    stats: Stats,
+    stats: StorageStat,
   ) {
     const result = firstDateTime(exifTags);
     const tag = result?.tag;
