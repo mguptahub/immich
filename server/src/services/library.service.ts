@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Insertable } from 'kysely';
 import { R_OK } from 'node:constants';
-import { Stats } from 'node:fs';
 import path, { isAbsolute, parse } from 'node:path';
 import picomatch from 'picomatch';
 import { JOBS_LIBRARY_PAGINATION_SIZE } from 'src/constants';
@@ -30,6 +29,7 @@ import {
 } from 'src/enum';
 import { ArgOf } from 'src/repositories/event.repository';
 import { AssetSyncResult } from 'src/repositories/library.repository';
+import { StorageStat } from 'src/repositories/storage.repository';
 import { AssetTable } from 'src/schema/tables/asset.table';
 import { BaseService } from 'src/services/base.service';
 import { JobOf } from 'src/types';
@@ -579,7 +579,7 @@ export class LibraryService extends BaseService {
       status: AssetStatus;
       fileModifiedAt: Date;
     },
-    stat: Stats | null,
+    stat: StorageStat | null,
   ): AssetSyncResult {
     if (!stat) {
       // File not found on disk or permission error

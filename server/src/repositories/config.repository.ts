@@ -21,9 +21,11 @@ import {
   LogFormat,
   LogLevel,
   QueueName,
+  StorageProvider,
 } from 'src/enum';
 import { VectorExtension } from 'src/types';
 import { setDifference } from 'src/utils/set';
+import z from 'zod';
 
 export interface EnvData {
   host?: string;
@@ -114,6 +116,16 @@ export interface EnvData {
   storage: {
     ignoreMountCheckErrors: boolean;
     mediaLocation?: string;
+    provider: StorageProvider;
+    s3?: {
+      bucket: string;
+      region?: string;
+      endpoint?: string;
+      accessKeyId?: string;
+      secretAccessKey?: string;
+      forcePathStyle: boolean;
+      keyPrefix?: string;
+    };
   };
 
   workers: ImmichWorker[];
@@ -168,6 +180,37 @@ const resolveHelmetFile = (helmetFile: 'true' | 'false' | string | undefined) =>
   } catch (error) {
     throw new Error(`Failed to read helmet file: ${helmetFile}`, { cause: error });
   }
+};
+
+const getStorageConfig = (dto: z.infer<typeof EnvSchema>): EnvData['storage'] => {
+  const provider = dto.STORAGE_PROVIDER || StorageProvider.Local;
+
+  if (provider !== StorageProvider.S3) {
+    return {
+      ignoreMountCheckErrors: !!dto.IMMICH_IGNORE_MOUNT_CHECK_ERRORS,
+      mediaLocation: dto.IMMICH_MEDIA_LOCATION,
+      provider,
+    };
+  }
+
+  if (!dto.S3_BUCKET) {
+    throw new Error('S3_BUCKET is required when STORAGE_PROVIDER=s3');
+  }
+
+  return {
+    ignoreMountCheckErrors: !!dto.IMMICH_IGNORE_MOUNT_CHECK_ERRORS,
+    mediaLocation: dto.IMMICH_MEDIA_LOCATION,
+    provider,
+    s3: {
+      bucket: dto.S3_BUCKET,
+      region: dto.S3_REGION,
+      endpoint: dto.S3_ENDPOINT,
+      accessKeyId: dto.S3_ACCESS_KEY_ID,
+      secretAccessKey: dto.S3_SECRET_ACCESS_KEY,
+      forcePathStyle: !!dto.S3_FORCE_PATH_STYLE,
+      keyPrefix: dto.S3_KEY_PREFIX,
+    },
+  };
 };
 
 const getEnv = (): EnvData => {
@@ -355,10 +398,7 @@ const getEnv = (): EnvData => {
       allow: dto.IMMICH_ALLOW_SETUP ?? true,
     },
 
-    storage: {
-      ignoreMountCheckErrors: !!dto.IMMICH_IGNORE_MOUNT_CHECK_ERRORS,
-      mediaLocation: dto.IMMICH_MEDIA_LOCATION,
-    },
+    storage: getStorageConfig(dto),
 
     telemetry: {
       apiPort: dto.IMMICH_API_METRICS_PORT || 8081,

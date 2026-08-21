@@ -104,6 +104,25 @@ When `DB_URL` is defined, the `DB_HOSTNAME`, `DB_PORT`, `DB_USERNAME`, `DB_PASSW
 
 :::
 
+## Storage
+
+| Variable               | Description                                                                       |  Default  | Containers          |
+| :--------------------- | :--------------------------------------------------------------------------------- | :-------: | :------------------ |
+| `STORAGE_PROVIDER`     | Where managed asset storage (originals, thumbnails, encoded video, profile images, backups) lives: `local` or `s3` |  `local`  | server               | api, microservices |
+| `S3_BUCKET`            | S3 bucket name. Required when `STORAGE_PROVIDER=s3`                               |           | server               | api, microservices |
+| `S3_REGION`            | S3 region                                                                          | `us-east-1` | server             | api, microservices |
+| `S3_ENDPOINT`          | Custom S3-compatible endpoint (MinIO, Backblaze B2, Cloudflare R2, etc.)           |           | server               | api, microservices |
+| `S3_ACCESS_KEY_ID`     | S3 access key ID. If unset, falls back to the default AWS credential chain (e.g. an instance/IAM role) |           | server               | api, microservices |
+| `S3_SECRET_ACCESS_KEY` | S3 secret access key                                                               |           | server               | api, microservices |
+| `S3_FORCE_PATH_STYLE`  | Use path-style requests (`https://endpoint/bucket/key`) instead of virtual-hosted-style. Needed by most non-AWS S3-compatible services | `false` | server | api, microservices |
+| `S3_KEY_PREFIX`        | Optional prefix to namespace objects within the bucket                            |           | server               | api, microservices |
+
+:::info
+
+`UPLOAD_LOCATION` (and its container volume mount) is still required even when `STORAGE_PROVIDER=s3` - it becomes a small, mostly-empty local directory instead of where your media lives. External/watched libraries (importing photos from a mounted host folder) always stay on local disk regardless of `STORAGE_PROVIDER`, since they inherently need real filesystem paths.
+
+:::
+
 ## Redis
 
 | Variable         | Description    | Default | Containers |

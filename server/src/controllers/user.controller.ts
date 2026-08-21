@@ -11,12 +11,13 @@ import {
   Post,
   Put,
   Query,
+  Req,
   Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Endpoint, HistoryBuilder } from 'src/decorators';
 import { AuthDto } from 'src/dtos/auth.dto';
 import { CalendarHeatmapDto, CalendarHeatmapResponseDto } from 'src/dtos/calendar-heatmap.dto';
@@ -29,6 +30,7 @@ import { ApiTag, Permission, RouteKey } from 'src/enum';
 import { Auth, Authenticated, FileResponse } from 'src/middleware/auth.guard';
 import { FileUploadInterceptor } from 'src/middleware/file-upload.interceptor';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { StorageRepository } from 'src/repositories/storage.repository';
 import { UserService } from 'src/services/user.service';
 import { sendFile } from 'src/utils/file';
 import { UUIDParamDto } from 'src/validation';
@@ -39,6 +41,7 @@ export class UserController {
   constructor(
     private service: UserService,
     private logger: LoggingRepository,
+    private storageRepository: StorageRepository,
   ) {}
 
   @Get()
@@ -251,7 +254,12 @@ export class UserController {
     description: 'Retrieve the profile image file for a user.',
     history: new HistoryBuilder().added('v1').beta('v1').stable('v2'),
   })
-  async getProfileImage(@Res() res: Response, @Next() next: NextFunction, @Param() { id }: UUIDParamDto) {
-    await sendFile(res, next, () => this.service.getProfileImage(id), this.logger);
+  async getProfileImage(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+    @Param() { id }: UUIDParamDto,
+  ) {
+    await sendFile(res, req, next, () => this.service.getProfileImage(id), this.storageRepository, this.logger);
   }
 }

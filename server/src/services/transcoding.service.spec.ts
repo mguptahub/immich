@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   HLS_BACKPRESSURE_PAUSE_SEGMENTS,
   HLS_BACKPRESSURE_RESUME_SEGMENTS,
@@ -18,6 +20,8 @@ describe(TranscodingService.name, () => {
   const sessionId = 'session-1';
   const assetId = 'asset-1';
   const ownerId = 'user-1';
+  const hlsVariantDir = (variantIndex: number) =>
+    join(tmpdir(), 'immich-hls', ownerId, sessionId, String(variantIndex));
 
   const completeSegment = (index: number) => {
     const listener = vi.mocked(mocks.storage.watchDir).mock.lastCall?.[1];
@@ -422,8 +426,8 @@ describe(TranscodingService.name, () => {
           '-svtav1-params',
           'hierarchical-levels=3:lookahead=0:enable-tf=0:mbr=4000k',
           '-hls_segment_filename',
-          '/data/encoded-video/user-1/se/ss/session-1/6/seg_%d.m4s',
-          '/data/encoded-video/user-1/se/ss/session-1/6/playlist.m3u8',
+          join(hlsVariantDir(6), 'seg_%d.m4s'),
+          join(hlsVariantDir(6), 'playlist.m3u8'),
         ].sort(),
       },
       {
@@ -449,8 +453,8 @@ describe(TranscodingService.name, () => {
           '-vf',
           'scale=720:-2',
           '-hls_segment_filename',
-          '/data/encoded-video/user-1/se/ss/session-1/4/seg_%d.m4s',
-          '/data/encoded-video/user-1/se/ss/session-1/4/playlist.m3u8',
+          join(hlsVariantDir(4), 'seg_%d.m4s'),
+          join(hlsVariantDir(4), 'playlist.m3u8'),
         ].sort(),
       },
       {
@@ -474,8 +478,8 @@ describe(TranscodingService.name, () => {
           '-vf',
           'scale=480:-2',
           '-hls_segment_filename',
-          '/data/encoded-video/user-1/se/ss/session-1/2/seg_%d.m4s',
-          '/data/encoded-video/user-1/se/ss/session-1/2/playlist.m3u8',
+          join(hlsVariantDir(2), 'seg_%d.m4s'),
+          join(hlsVariantDir(2), 'playlist.m3u8'),
         ].sort(),
       },
     ])('builds the expected FFmpeg command for $codec (variant $variantIndex)', async ({ variantIndex, expected }) => {

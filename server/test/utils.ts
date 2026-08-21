@@ -128,6 +128,7 @@ export const controllerSetup = async (controller: ControllerClass | ControllerCl
       { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
       { provide: APP_GUARD, useClass: AuthGuard },
       { provide: LoggingRepository, useValue: LoggingRepository.create() },
+      { provide: StorageRepository, useValue: mockStorageRepository() },
       { provide: ClsService, useValue: { getId: vi.fn() } },
       { provide: AuthService, useValue: { authenticate: vi.fn(), requireSetupAvailable: vi.fn() } },
       ...providers,
@@ -178,6 +179,13 @@ const mockFn = (label: string, { strict }: { strict: boolean }) => {
 export const mockBaseService = <T extends BaseService>(service: new (...args: any[]) => T) => {
   return automock(service, { args: [{ setContext: () => {} }], strict: false });
 };
+
+/** For controller test modules that need a StorageRepository provider (e.g. behind `sendFile`). */
+export const mockStorageRepository = () =>
+  automock(StorageRepository, {
+    strict: false,
+    args: [{ getEnv: () => ({ storage: {} }) } as any, { setContext: () => {} } as any],
+  });
 
 export const automock = <T>(
   Dependency: new (...args: any[]) => T,

@@ -345,6 +345,11 @@ export enum StorageFolder {
 
 export const StorageFolderSchema = z.enum(StorageFolder).describe('Storage folder').meta({ id: 'StorageFolder' });
 
+export enum StorageProvider {
+  Local = 'local',
+  S3 = 's3',
+}
+
 export enum SystemMetadataKey {
   MediaLocation = 'MediaLocation',
   ReverseGeocodingState = 'reverse-geocoding-state',

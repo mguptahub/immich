@@ -16,6 +16,14 @@ const resetEnv = () => {
     'IMMICH_TRUSTED_PROXIES',
     'IMMICH_API_METRICS_PORT',
     'IMMICH_MEDIA_LOCATION',
+    'STORAGE_PROVIDER',
+    'S3_BUCKET',
+    'S3_REGION',
+    'S3_ENDPOINT',
+    'S3_ACCESS_KEY_ID',
+    'S3_SECRET_ACCESS_KEY',
+    'S3_FORCE_PATH_STYLE',
+    'S3_KEY_PREFIX',
     'IMMICH_MICROSERVICES_METRICS_PORT',
     'IMMICH_TELEMETRY_INCLUDE',
     'IMMICH_TELEMETRY_EXCLUDE',
@@ -86,6 +94,43 @@ describe('getEnv', () => {
     it('should throw an error for relative paths', () => {
       process.env.IMMICH_MEDIA_LOCATION = './relative/path';
       expect(() => getEnv()).toThrowError('[IMMICH_MEDIA_LOCATION] Must be an absolute path');
+    });
+  });
+
+  describe('storage', () => {
+    it('should default to local storage', () => {
+      const config = getEnv();
+      expect(config.storage.provider).toBe('local');
+      expect(config.storage.s3).toBeUndefined();
+    });
+
+    it('should throw when STORAGE_PROVIDER=s3 without S3_BUCKET', () => {
+      process.env.STORAGE_PROVIDER = 's3';
+      expect(() => getEnv()).toThrowError('S3_BUCKET is required when STORAGE_PROVIDER=s3');
+    });
+
+    it('should parse s3 config', () => {
+      process.env.STORAGE_PROVIDER = 's3';
+      process.env.S3_BUCKET = 'my-bucket';
+      process.env.S3_REGION = 'us-west-2';
+      process.env.S3_ENDPOINT = 'https://minio.local';
+      process.env.S3_ACCESS_KEY_ID = 'access-key';
+      process.env.S3_SECRET_ACCESS_KEY = 'secret-key';
+      process.env.S3_FORCE_PATH_STYLE = 'true';
+      process.env.S3_KEY_PREFIX = 'immich';
+
+      const config = getEnv();
+
+      expect(config.storage.provider).toBe('s3');
+      expect(config.storage.s3).toEqual({
+        bucket: 'my-bucket',
+        region: 'us-west-2',
+        endpoint: 'https://minio.local',
+        accessKeyId: 'access-key',
+        secretAccessKey: 'secret-key',
+        forcePathStyle: true,
+        keyPrefix: 'immich',
+      });
     });
   });
 
