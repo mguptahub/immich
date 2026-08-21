@@ -50,6 +50,14 @@
 > [!NOTE]
 > You can find the main documentation, including installation guides, at https://immich.app/.
 
+## This fork
+
+This is `mguptahub/immich`, a fork of [immich-app/immich](https://github.com/immich-app/immich) that adds **S3-compatible object storage** as an alternative to local disk. Set `STORAGE_PROVIDER=s3` and the matching `S3_*` variables (see [`docker/example.env`](docker/example.env)) to store uploaded photos/videos, thumbnails, encoded video, profile images, and database backups in a bucket — AWS S3, MinIO, Backblaze B2, Cloudflare R2, or anything else that speaks the S3 API — instead of the local `UPLOAD_LOCATION` volume. Everything else about Immich works the same; external/watched libraries always stay on local disk.
+
+For local testing, [`docker/docker-compose.dev.yml`](docker/docker-compose.dev.yml) includes an optional MinIO service (`docker compose -f docker-compose.dev.yml --profile s3 up`).
+
+Custom development happens on the [`production`](https://github.com/mguptahub/immich/tree/production) branch; `main` stays a clean mirror of upstream. Published Docker images are built from `production` and tagged releases — see [Releases](https://github.com/mguptahub/immich/releases).
+
 ## Links
 
 - [Documentation](https://docs.immich.app/)
