@@ -12,13 +12,13 @@ name: immich-prod
 services:
   immich-server:
     container_name: immich_server
-    image: immich-server:latest
+    # Built and published by .github/workflows/build-docker.yml on every push to
+    # `production`. Override IMMICH_SERVER_IMAGE_TAG in .env to pin a specific
+    # tag (e.g. a sha-xxxxxxx or vX.Y.Z build) instead of always tracking latest.
+    image: ghcr.io/mguptahub/immich-server:${IMMICH_SERVER_IMAGE_TAG:-latest}
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
-    build:
-      context: ../
-      dockerfile: server/Dockerfile
     volumes:
       - ${UPLOAD_LOCATION}/photos:/data
       - /etc/localtime:/etc/localtime:ro

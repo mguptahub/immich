@@ -1,7 +1,11 @@
+# NOTE: automatic triggers disabled for this fork - this workflow mirrors
+# immich-app/immich upstream CI/community-management and doesn't apply here
+# (missing org secrets/reusable workflows it depends on). Kept as reference
+# and still runnable manually via workflow_dispatch. See build-docker.yml for
+# this fork's own image build/publish workflow.
 name: 'Pull Request Labeler'
 on:
-  - pull_request_target # zizmor: ignore[dangerous-triggers] no attacker inputs are used here
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

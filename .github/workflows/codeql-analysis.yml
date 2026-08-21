@@ -1,3 +1,8 @@
+# NOTE: automatic triggers disabled for this fork - this workflow mirrors
+# immich-app/immich upstream CI/community-management and doesn't apply here
+# (missing org secrets/reusable workflows it depends on). Kept as reference
+# and still runnable manually via workflow_dispatch. See build-docker.yml for
+# this fork's own image build/publish workflow.
 # For most projects, this workflow file will not need changing; you simply need
 # to commit it to your repository.
 #
@@ -12,14 +17,7 @@
 name: 'CodeQL'
 
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ['main']
-  schedule:
-    - cron: '20 13 * * 1'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
